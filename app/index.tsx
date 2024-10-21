@@ -1,5 +1,6 @@
 import { Text, View, StyleSheet, 
-		TextInput, Pressable
+		TextInput, Pressable,
+		Button
 } from "react-native";
 import { useFonts } from "expo-font";
 import IconRocket from './iconrocket';
@@ -7,9 +8,16 @@ import IconRobot from './robot';
 import { Endpoints } from "@/constants/Endpoints";
 import { useState } from 'react'
 
+import * as Crypto from 'expo-crypto';
+import { Link, router } from "expo-router";
+
+
 
 //https://docs.expo.dev/develop/user-interface/fonts/
 //https://reactsvgicons.com/react-svg-icons-guide
+
+//https://docs.expo.dev/router/introduction/
+//https://docs.expo.dev/router/navigating-pages/
 
 export default function Index() {
 
@@ -20,23 +28,32 @@ export default function Index() {
 	const [userValue, setUserValue] = useState('');
 	const [passValue, setPassValue] = useState('');
 
+	const [failedLogin, setFailedLogin]= useState(false);
+
 	const onButtonLogin = async ()=>
 	{
 		console.log('logging in!');
 		//hacer la peticion de login
 		//console.log(Endpoints.LOGIN);
+		const digest = await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256,
+			passValue);
 
 		const form = new FormData();
 		form.append('token','code37');
 		form.append('user',userValue);
-		form.append('pass', passValue);
+		form.append('pass', digest);
 
 		fetch( Endpoints.LOGIN , {
 			method:'POST',
 			body:form
 		})
 		.then( response=>response.json())
-		.then( data => {console.log(data) })
+		.then( data => {console.log(data) 
+			if(!data.error && data.id)
+				router.replace('/mainmenu');
+			else
+				setFailedLogin(true);
+		})
 		.catch( err=>{console.log(err)});
 	}
 
@@ -48,7 +65,11 @@ export default function Index() {
 		<Text >¡Te damos la bienvenida!</Text>
 		<View style={styles.inputfieldlabel}>
 			<Text >Usuario</Text>
-			<TextInput style={styles.input} onChangeText={setUserValue}     secureTextEntry></TextInput>
+			<TextInput style={styles.input} onChangeText={setUserValue}></TextInput>
+		</View>
+		<View style={styles.inputfieldlabel}>
+			<Text >Contraseña</Text>
+			<TextInput style={styles.input} onChangeText={setPassValue} secureTextEntry></TextInput>
 		</View>
 		<Pressable style={styles.botonconlogo} onPress={onButtonLogin} >
 			<IconRobot width='32' height='32'></IconRobot>
@@ -59,6 +80,10 @@ export default function Index() {
 			<IconRobot width='32' height='32'></IconRobot>
 			<Text>Regístrate.</Text>
 		</Pressable>
+		{failedLogin? (<Text>fallo al login</Text>):undefined}
+		<Link href="/mainmenu" asChild>
+			<Button title="main"></Button>
+		</Link>
 
     </View>
 	
