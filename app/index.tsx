@@ -6,18 +6,20 @@ import { useFonts } from "expo-font";
 import IconRocket from './iconrocket';
 import IconRobot from './robot';
 import { Endpoints } from "@/constants/Endpoints";
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 
 import * as Crypto from 'expo-crypto';
 import { Link, router } from "expo-router";
 
-
+import { Context } from "./Context";
 
 //https://docs.expo.dev/develop/user-interface/fonts/
 //https://reactsvgicons.com/react-svg-icons-guide
 
 //https://docs.expo.dev/router/introduction/
 //https://docs.expo.dev/router/navigating-pages/
+
+//https://react.dev/learn/passing-data-deeply-with-context
 
 export default function Index() {
 
@@ -29,6 +31,8 @@ export default function Index() {
 	const [passValue, setPassValue] = useState('');
 
 	const [failedLogin, setFailedLogin]= useState(false);
+
+	const {loginData, setLoginData}=useContext(Context);
 
 	const onButtonLogin = async ()=>
 	{
@@ -50,9 +54,14 @@ export default function Index() {
 		.then( response=>response.json())
 		.then( data => {console.log(data) 
 			if(!data.error && data.id)
+			{
+				setLoginData(data);
 				router.replace('/mainmenu');
+			}
 			else
+			{
 				setFailedLogin(true);
+			}
 		})
 		.catch( err=>{console.log(err)});
 	}
@@ -63,6 +72,7 @@ export default function Index() {
 		<IconRocket width='150' height='150'></IconRocket>
 		<Text style={styles.title}>AppTitle</Text>
 		<Text >¡Te damos la bienvenida!</Text>
+		
 		<View style={styles.inputfieldlabel}>
 			<Text >Usuario</Text>
 			<TextInput style={styles.input} onChangeText={setUserValue}></TextInput>
@@ -81,8 +91,8 @@ export default function Index() {
 			<Text>Regístrate.</Text>
 		</Pressable>
 		{failedLogin? (<Text>fallo al login</Text>):undefined}
-		<Link href="/mainmenu" asChild>
-			<Button title="main"></Button>
+		<Link href="/mainmenu"  asChild={true} >
+			<Button title="contexto"></Button>
 		</Link>
 
     </View>
