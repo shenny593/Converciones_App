@@ -1,14 +1,15 @@
 import { Stack } from "expo-router";
 
-import { ContextProvider } from "./Context";
+import { MyContextProvider } from "./Context";
 
 export default function RootLayout() {
   return (
-	<ContextProvider>
-		<Stack>
-			<Stack.Screen name="mainmenu"  />
+	<MyContextProvider>
+		<Stack>	
 			<Stack.Screen name="index" options={{headerShown: false}} />
+			<Stack.Screen name="mainmenu"  />
+			<Stack.Screen name="credits"  />
 		</Stack>
-	</ContextProvider>
+	</MyContextProvider>
   );
 }

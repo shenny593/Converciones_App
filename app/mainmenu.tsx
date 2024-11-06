@@ -1,31 +1,27 @@
 import {View, Text, Image, StyleSheet} from "react-native";
-import { useContext } from 'react'
-import { Context } from "./Context";
-import { router } from "expo-router";
+import { Link, router } from "expo-router";
+import { useContext, useState } from 'react'
+import { MyContext } from "./Context";
+
 
 
 export default function Index()
 {
-	const {loginData, setLoginData}=useContext(Context);
-	//console.log(context);
-
-	const logout=()=>
-	{
-		
-		
-	}
-
+	const {loginData, setLoginData}=useContext(MyContext);
 	return (
 		<View style={styles.container}>
-			<Text>Welcome back {loginData.username}</Text>
-			<Image style={styles.pfp_image} source={{uri:loginData.pfp_url}} ></Image>
-			<Text>Clave de usuario</Text>
-			<Text>{loginData.id}</Text>
-			<Text>Creditos</Text>
-			<Text>{loginData.credits}</Text>
-			<Text>XP</Text>
-			<Text>{loginData.xp}</Text>
+			<View style={styles.profile}>
+				<Text>Welcome back {loginData.firstname}!</Text>	
+				<Image style={styles.pfp_image}
+					source={{uri:loginData.pfp_url}} ></Image>
+			</View>	
 			
+			
+				<View style={styles.footer}>
+				<Link href="/credits">
+				<Text>Made with 🧡 by Appify Team.</Text>
+				</Link>
+				</View>	
 		</View>
 	)
 }
@@ -36,9 +32,22 @@ const styles=StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 	},
+	profile:{
+		backgroundColor:"#Faa",
+		width:300,
+		height:300,
+		padding:10
+	},
+	footer:{
+		position:"absolute",
+		bottom:5,
+		backgroundColor:"#afa",
+		padding:10,
+	},
 	pfp_image:{
 		width:260,
 		height:260,
 		borderRadius:5
 	}
 });
+

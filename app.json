@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "user-profile",
-    "slug": "user-profile",
+    "name": "devtest-profileapp",
+    "slug": "devtest-profileapp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -19,7 +19,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.fmg2099.userprofile"
     },
     "web": {
       "bundler": "metro",
@@ -28,10 +29,32 @@
     },
     "plugins": [
       "expo-router",
-      "expo-font"
+      "expo-font",
+      [ 
+	  "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with your friends."
+        }
+	  ],
+	  [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+          "recordAudioAndroid": true
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "69f384d9-6704-473b-978d-b0bab0a34f92"
+      }
     }
   }
 }

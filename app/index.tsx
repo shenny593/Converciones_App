@@ -1,17 +1,15 @@
 import { Text, View, StyleSheet, 
 		TextInput, Pressable,
-		Button
+		Button, Platform
 } from "react-native";
 import { useFonts } from "expo-font";
 import IconRocket from './iconrocket';
 import IconRobot from './robot';
 import { Endpoints } from "@/constants/Endpoints";
 import { useContext, useState } from 'react'
-
+import { MyContext } from "./Context";
 import * as Crypto from 'expo-crypto';
 import { Link, router } from "expo-router";
-
-import { Context } from "./Context";
 
 //https://docs.expo.dev/develop/user-interface/fonts/
 //https://reactsvgicons.com/react-svg-icons-guide
@@ -26,13 +24,10 @@ export default function Index() {
 	const [loaded, error] = useFonts({
 		'poppins': require('../assets/fonts/PoppinsSemiBold.ttf'),
 	  });
-
 	const [userValue, setUserValue] = useState('');
 	const [passValue, setPassValue] = useState('');
-
 	const [failedLogin, setFailedLogin]= useState(false);
-
-	const {loginData, setLoginData}=useContext(Context);
+	const {loginData, setLoginData}=useContext(MyContext);
 
 	const onButtonLogin = async ()=>
 	{
@@ -66,12 +61,15 @@ export default function Index() {
 		.catch( err=>{console.log(err)});
 	}
 
-
   return (
     <View style={styles.container}>
-		<IconRocket width='150' height='150'></IconRocket>
-		<Text style={styles.title}>AppTitle</Text>
-		<Text >¡Te damos la bienvenida!</Text>
+		<IconRocket width="150" height="150"></IconRocket>
+		<Text style={styles.title}>Appify</Text>
+		<Text style={styles.subtitle}>¡Te damos la bienvenida!</Text>
+
+		<Link href="./pruebafoto" asChild>
+			<Button title="Prueba de imagen"></Button>
+		</Link>
 		
 		<View style={styles.inputfieldlabel}>
 			<Text >Usuario</Text>
@@ -81,6 +79,7 @@ export default function Index() {
 			<Text >Contraseña</Text>
 			<TextInput style={styles.input} onChangeText={setPassValue} secureTextEntry></TextInput>
 		</View>
+		{failedLogin? (<Text style={styles.error}>fallo al login</Text>):undefined}
 		<Pressable style={styles.botonconlogo} onPress={onButtonLogin} >
 			<IconRobot width='32' height='32'></IconRobot>
 			<Text>Log in!</Text>
@@ -90,10 +89,6 @@ export default function Index() {
 			<IconRobot width='32' height='32'></IconRobot>
 			<Text>Regístrate.</Text>
 		</Pressable>
-		{failedLogin? (<Text>fallo al login</Text>):undefined}
-		<Link href="/mainmenu"  asChild={true} >
-			<Button title="contexto"></Button>
-		</Link>
 
     </View>
 	
@@ -110,6 +105,10 @@ const styles=StyleSheet.create(
 		title:{
 			fontFamily:'poppins',
 			fontSize:44
+		},
+		subtitle:{
+			fontFamily:'poppins',
+			fontSize:18
 		},
 		inputfieldlabel:
 		{
@@ -136,6 +135,10 @@ const styles=StyleSheet.create(
 			borderWidth:2,
 			width:150
 		},
+		error:{
+			padding:5,
+			color:"#F22"
+		}
 		//#973131 #E0A75E #F9D689 #F5E7B2
 		
 	}
