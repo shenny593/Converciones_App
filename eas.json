@@ -5,15 +5,22 @@
   "build": {
     "preview": {
       "distribution": "internal",
-	  "android": {
+      "android": {
         "buildType": "apk"
       }
     },
-	"development": {
+    "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      }
     },
-    "production": {}
+    "production": {
+      "android": {
+        "buildType": "app-bundle"
+      }
+    }
   },
   "submit": {
     "production": {}

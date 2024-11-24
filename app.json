@@ -20,7 +20,11 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.fmg2099.userprofile"
+      "package": "com.fmg2099.userprofile",
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.CAMERA"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -30,13 +34,13 @@
     "plugins": [
       "expo-router",
       "expo-font",
-      [ 
-	  "expo-image-picker",
+      [
+        "expo-image-picker",
         {
           "photosPermission": "The app accesses your photos to let you share them with your friends."
         }
-	  ],
-	  [
+      ],
+      [
         "expo-camera",
         {
           "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
@@ -53,7 +57,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "69f384d9-6704-473b-978d-b0bab0a34f92"
+        "projectId": "983a73f7-b094-43d3-aa21-28caaa426c64"
       }
     }
   }

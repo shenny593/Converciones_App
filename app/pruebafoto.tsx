@@ -1,184 +1,216 @@
-import {View, Text, Image, StyleSheet, Pressable, Platform, Button} from "react-native";
-import { router } from "expo-router";
-import { useState, useRef } from "react";
+import { View, Text, StyleSheet, TextInput, Image } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { useState } from "react";
+import { Picker } from '@react-native-picker/picker';
 
-import { Endpoints } from "@/constants/Endpoints";
-import * as ImagePicker from 'expo-image-picker';
-import { Camera, CameraView, CameraType, useCameraPermissions } from 'expo-camera';
-import { ImageType } from "expo-camera/build/legacy/Camera.types";
+export default function LengthConverter() {
+  const [selectedUnitFrom, setSelectedUnitFrom] = useState("metros"); // Unidad de origen
+  const [selectedUnitTo, setSelectedUnitTo] = useState("kilometros"); // Unidad de destino
+  const [inputValue, setInputValue] = useState(""); // Valor de entrada
+  const [result, setResult] = useState(0); // Resultado de la conversión
 
-export default function Index()
-{
-	const userIDprueba = 6666
+  // Mapeo de conversiones de unidades de longitud
+  const conversionRates = {
+    metros: {
+      kilometros: 0.001,
+      centimetros: 100,
+      milimetros: 1000,
+      pulgadas: 39.3701,
+      pies: 3.28084,
+      metros: 1,
+    },
+    kilometros: {
+      metros: 1000,
+      centimetros: 100000,
+      milimetros: 1000000,
+      pulgadas: 39370.1,
+      pies: 3280.84,
+      kilometros: 1,
+    },
+    centimetros: {
+      metros: 0.01,
+      kilometros: 0.00001,
+      milimetros: 10,
+      pulgadas: 0.393701,
+      pies: 0.0328084,
+      centimetros: 1,
+    },
+    milimetros: {
+      metros: 0.001,
+      kilometros: 0.000001,
+      centimetros: 0.1,
+      pulgadas: 0.0393701,
+      pies: 0.00328084,
+      milimetros: 1,
+    },
+    pulgadas: {
+      metros: 0.0254,
+      kilometros: 0.0000254,
+      centimetros: 2.54,
+      milimetros: 25.4,
+      pies: 0.0833333,
+      pulgadas: 1,
+    },
+    pies: {
+      metros: 0.3048,
+      kilometros: 0.0003048,
+      centimetros: 30.48,
+      milimetros: 304.8,
+      pulgadas: 12,
+      pies: 1,
+    },
+  };
 
-///// con filePicker
-const [image, setImage] = useState<string | null>(null);
-const [debugInfo, setDebugInfo] = useState("");
-const [imageUri, setImageUri]=useState({uri:'http://monsterballgo.com/media/usr/default.png'});
-const [permission, requestPermission] = useCameraPermissions();
-const cameraRef = useRef<Camera | null>(null); // Camera reference
+  // Función para manejar la conversión
+  const handleConversion = (value) => {
+    if (!value) {
+      return; // Evitar conversiones con valores vacíos
+    }
 
-//////////// con filePicker
+    const conversionResult = value * conversionRates[selectedUnitFrom][selectedUnitTo];
+    setResult(conversionResult);
+  };
 
-const pick = async () => {
-	// No permissions request is necessary for launching the image library
-	// let result = await ImagePicker.launchImageLibraryAsync({
-	//   mediaTypes: ImagePicker.MediaTypeOptions.All,
-	//   allowsEditing: true,
-	//   aspect: [1, 1],
-	//   quality: 1,
-	// });
-	let result = await ImagePicker.launchCameraAsync({
-		  mediaTypes: ImagePicker.MediaTypeOptions.All,
-		  allowsEditing: true,
-		  aspect: [1, 1],
-		  quality: 1,
-		});
+  return (
+    <LinearGradient
+      colors={["#000000", "#003366", "#1E3A5F", "#005C99"]} // Gradiente con más negro
+      style={styles.container}
+    >
+      <View style={styles.innerContainer}>
+        <Image 
+          source={require('../assets/images/regla.png')} // Asegúrate de tener una imagen representativa de unidades
+          style={styles.icon} 
+        />
+        <Text style={styles.converterTitle}>Conversor de Unidades de Medida</Text>
 
-	if (!result.canceled) {
-		console.log(result.assets.length);
-		setImage(result.assets[0].uri);
-		const form = new FormData();
-		form.append('token','code37');
-		form.append('id', String(userIDprueba));
-		console.log(Platform.OS);
-		form.append('image', {
-			uri: Platform.OS === 'ios' ? image.replace('file://', '') : image,
-			name: 'image0ne',
-			type: 'image/jpeg'
-			});
-		console.log(form.getAll('image'));
+        {/* Unidad de origen */}
+        <Text style={styles.label}>Selecciona la unidad de origen</Text>
+        <Picker
+          selectedValue={selectedUnitFrom}
+          style={styles.picker}
+          onValueChange={(itemValue) => {
+            setSelectedUnitFrom(itemValue);
+            handleConversion(inputValue);
+          }}
+        >
+          <Picker.Item label="Metros" value="metros" />
+          <Picker.Item label="Kilómetros" value="kilometros" />
+          <Picker.Item label="Centímetros" value="centimetros" />
+          <Picker.Item label="Milímetros" value="milimetros" />
+          <Picker.Item label="Pulgadas" value="pulgadas" />
+          <Picker.Item label="Pies" value="pies" />
+        </Picker>
 
-		fetch( Endpoints.SET_PROFILE_PICTURE , {
-			method:'POST',
-			body:form,
-			headers: {
-				'Content-Type': 'multipart/form-data',
-			  },
-		})
-		.then( response=>response.json())
-		.then( data => {
-			setImageUri({uri:data.pfp_url});
-			setDebugInfo( JSON.stringify(data));
-			console.log(debugInfo);
-			
-			})
-		.catch( err=>{console.log(err)});
+        {/* Unidad de destino */}
+        <Text style={styles.label}>Selecciona la unidad de destino</Text>
+        <Picker
+          selectedValue={selectedUnitTo}
+          style={styles.picker}
+          onValueChange={(itemValue) => {
+            setSelectedUnitTo(itemValue);
+            handleConversion(inputValue);
+          }}
+        >
+          <Picker.Item label="Metros" value="metros" />
+          <Picker.Item label="Kilómetros" value="kilometros" />
+          <Picker.Item label="Centímetros" value="centimetros" />
+          <Picker.Item label="Milímetros" value="milimetros" />
+          <Picker.Item label="Pulgadas" value="pulgadas" />
+          <Picker.Item label="Pies" value="pies" />
+        </Picker>
 
-	}
-};
+        {/* Input de cantidad */}
+        <TextInput
+          style={styles.input}
+          keyboardType="numeric"
+          placeholder="Introduce la cantidad"
+          value={inputValue}
+          onChangeText={(text) => {
+            setInputValue(text);
+            handleConversion(Number(text));
+          }}
+        />
 
-////// con cámara
-	const askPermissions = ()=>
-	{
-		requestPermission();
-	}
-
-	const takePhotoAndUpload = async ()=>
-	{
-		if(!permission?.granted)
-		{
-			askPermissions();
-		}
-		else
-		{
-			cameraRef.current.takePictureAsync({
-				ImageType:'jpg',
-				quality:0,
-
-			})
-			.then( (picture)=>
-			{
-				console.log(picture.uri);
-				setImage(picture.uri);
-				const form = new FormData();
-				form.append('token','code37');
-				form.append('id', String(userIDprueba));
-				console.log(Platform.OS);
-				form.append('image', {
-					uri: Platform.OS === 'ios' ? image.replace('file://', '') : image,
-					name: 'image0ne',
-					type: 'image/jpeg'
-					});
-				console.log(form.getAll('image'));
-
-				fetch( Endpoints.SET_PROFILE_PICTURE , {
-					method:'POST',
-					body:form
-				})
-				.then( response=>response.json())
-				.then( data => {
-					setImageUri({uri:data.pfp_url});
-					setDebugInfo( JSON.stringify(data));
-					console.log(debugInfo);
-					
-					})
-				.catch( err=>{console.log(err)});
-			}
-			)
-		}
-	}
-
-	return (
-		<View style={styles.container}>
-			<Text>Prueba de setpfp usando cámara y FilePicker</Text>
-			<Text>ID a modificar: {userIDprueba}</Text>
-			{permission?.granted? 
-			(
-				<CameraView style={{width:200,height:200}} 
-				facing="back" 
-				ref={cameraRef}
-				pictureSize="640x480">
-				</CameraView>
-			):
-			(	
-				<View>
-				<Text>no perms</Text>
-				<Button title="Dar permiso" onPress={askPermissions}></Button>
-				</View>
-			)}
-			<View style={styles.botones}>
-				<Pressable style={styles.boton} onPress={takePhotoAndUpload}>
-					<Text>Foto</Text>
-				</Pressable>
-				<Pressable style={styles.boton} onPress={pick}>
-					<Text>Galería</Text>
-				</Pressable>
-			</View>
-			
-			<Text style={{padding:5}} >Resultado:</Text>
-			<Image style={{width:120,height:120}} source={imageUri}></Image>
-			<Text style={{fontSize:9,fontFamily:'monospace'}}>{debugInfo}</Text>
-		</View>
-	)
+        {/* Resultado de la conversión */}
+        <Text style={styles.resultText}>
+          Resultado: {result} {selectedUnitTo}
+        </Text>
+      </View>
+    </LinearGradient>
+  );
 }
 
-const styles=StyleSheet.create({
-	container:{
-		flex: 1,
-		justifyContent:"flex-start",
-		alignItems:"center",
-		padding:20,
-	},
-	botones:
-	{
-		flexDirection:"row",
-		padding:5
-	},
-	boton:
-	{
-		backgroundColor:'#F9D689',		
-		width:120,
-		height:35,
-		flexDirection:'row',
-		alignItems: 'center',
-		justifyContent:'center',
-		padding:5,
-		borderRadius:5,
-		borderColor:'#000',
-		borderWidth:2,
-		marginHorizontal:5
-	}
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  innerContainer: {
+    backgroundColor: 'transparent', // Mantiene la transparencia del fondo del LinearGradient
+    alignItems: "center",
+    padding: 20,
+    borderRadius: 10,
+  },
+  converterTitle: {
+    fontSize: 28,
+    color: "#1E90FF", // Azul neón
+    fontFamily: 'poppins',
+    textAlign: "center",
+    textShadowColor: "rgba(30, 144, 255, 0.8)",
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 10,
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 18,
+    color: "#1E90FF", // Azul neón
+    fontFamily: 'poppins',
+    marginBottom: 10,
+  },
+  picker: {
+    height: 50,
+    width: 250,
+    backgroundColor: "#333", // Fondo oscuro para los Picker
+    color: "#1E90FF", // Texto en azul neón
+    borderRadius: 5,
+    marginBottom: 20,
+  },
+  input: {
+    height: 40,
+    width: 250,
+    backgroundColor: "#333",
+    color: "#1E90FF",
+    borderRadius: 5,
+    borderWidth: 2,
+    borderColor: "#1E90FF",
+    padding: 10,
+    marginBottom: 20,
+    textAlign: "center",
+    shadowColor: "#1E90FF",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
+  },
+  resultText: {
+    fontSize: 22,
+    color: "#1E90FF",
+    fontFamily: 'poppins',
+    textAlign: "center",
+    marginBottom: 30,
+    padding: 10,
+    borderWidth: 2,
+    borderColor: "#1E90FF",
+    borderRadius: 5,
+    shadowColor: "#1E90FF",
+    shadowOpacity: 0.8,
+    shadowRadius: 10,
+  },
+  icon: {
+    width: 150,
+    height: 150,
+    marginBottom: 20,
+    resizeMode: "contain",
+    tintColor: "#1E90FF", // Azul neón
+  },
 });
-
-
